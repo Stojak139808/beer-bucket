@@ -1,0 +1,80 @@
+/*
+            xiao_ble
+         +-----------+
+        -|0        5V|- N/C
+        -|1       GND|- GND
+        -|2      3.3V|- 3.3V
+        -|3        10|-
+    SDA -|4         9|-
+    SCL -|5         8|- RELAY
+    TX  -|6         7|- RX
+         +-----------+
+*/
+
+/ {
+
+    // 16x2 lcd display
+    lcd: hd44780 {
+        compatible = "hit,hd44780";
+        status = "okay";
+
+        mode = <4>;
+        
+        columns = <16>;
+        rows = <2>;
+
+        register-select-gpios = <&aux_display_gpio_controller 0 (GPIO_ACTIVE_HIGH)>;
+        //read-write-gpios = <&aux_display_gpio_controller 1 (GPIO_ACTIVE_HIGH)>;
+        enable-gpios = <&aux_display_gpio_controller 2 (GPIO_ACTIVE_HIGH)>;
+        backlight-gpios = <&aux_display_gpio_controller 3 (GPIO_ACTIVE_HIGH)>;
+        data-bus-gpios =
+            <0>, <0>, <0>, <0>,
+            <&aux_display_gpio_controller 4 (GPIO_ACTIVE_HIGH)>,
+            <&aux_display_gpio_controller 5 (GPIO_ACTIVE_HIGH)>,
+            <&aux_display_gpio_controller 6 (GPIO_ACTIVE_HIGH)>,
+            <&aux_display_gpio_controller 7 (GPIO_ACTIVE_HIGH)>;
+    };
+
+    // 1-wire bus for DS18B20 temperature sensor
+    w1: w1 {
+        compatible = "zephyr,w1-gpio";
+        status = "okay";
+        gpios = <&xiao_d 0 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN | GPIO_PULL_UP)>;
+    };
+    
+    outputs {
+        compatible = "gpio-leds"; // this is not an LED, needs to be fixed
+        relay_main: relay_main {
+            gpios = <&gpio1 13 GPIO_ACTIVE_HIGH>;
+            status = "okay";
+
+        };
+    };
+};
+
+// I2C bus
+&i2c1 {
+    status = "okay";
+    clock-frequency = <I2C_BITRATE_STANDARD>;
+
+    // PCF8574 I/O expander for the LCD
+    aux_display_gpio_controller: pcf8574@27 {
+        compatible = "nxp,pcf857x";
+        reg = <0x27>;
+        gpio-controller;
+        ngpios = <8>;
+        #gpio-cells = <2>;
+    };
+
+    // TMP102 temperature sensor
+    aux_temp_sensor: tmp102@48 {
+        compatible = "ti,tmp112";
+        status = "okay";
+        reg = <0x48>;
+        conversion-rate = <250>; // 250mHz conversion rate
+    };
+};
+
+&spi2 {
+    status = "disabled";
+};
