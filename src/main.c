@@ -1,6 +1,7 @@
+#include <zephyr/kernel.h>
+#include <string.h>
 #include "display.h"
 #include "temp_sensor.h"
-#include <zephyr/kernel.h>
 
 
 static struct k_sem temp_sensor_tick_sem;
@@ -31,15 +32,25 @@ static void temp_sensor_thread(void *a, void *b, void *c){
 
 int main(void)
 {
+
+    display_buffer_t screen_text;
+
+    memcpy(screen_text.data,
+        "hello                          ",
+        sizeof(display_buffer_t));
+
     printk("start\n");
 
 
     display_init();
-    display_main();
-    //k_timer_start(&temp_timer, K_SECONDS(1), K_SECONDS(5));
 
-    //for(;;){
-    //}
+    display_set_text(&screen_text);
+    display_set_brightness(0xFFU);
+
+    for(;;){
+        display_main();
+        k_sleep(K_MSEC(500));
+    }
 
 }
 
