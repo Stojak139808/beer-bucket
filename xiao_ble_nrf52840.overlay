@@ -39,7 +39,7 @@
     w1: w1 {
         compatible = "zephyr,w1-gpio";
         status = "okay";
-        gpios = <&xiao_d 0 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN | GPIO_PULL_UP)>;
+        gpios = <&gpio0 2 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN | GPIO_PULL_UP)>;
     };
     
     outputs {
