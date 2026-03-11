@@ -4,8 +4,8 @@
 #include <zephyr/device.h>
 
 #define _LCD_NODE        DT_NODELABEL(lcd)
-#define _LCD_COLUMNS     DT_PROP(_LCD_NODE, columns)
-#define _LCD_ROWS        DT_PROP(_LCD_NODE, rows)
+#define LCD_COLUMNS     DT_PROP(_LCD_NODE, columns)
+#define LCD_ROWS        DT_PROP(_LCD_NODE, rows)
 
 typedef enum display_control{
     DISP_ON,
@@ -13,7 +13,7 @@ typedef enum display_control{
 }display_control_t;
 
 typedef struct display_buffer{
-    uint8_t data[_LCD_COLUMNS * _LCD_ROWS];
+    uint8_t data[LCD_COLUMNS * LCD_ROWS];
 }display_buffer_t;
 
 void display_init(void);

@@ -11,6 +11,6 @@ typedef enum temp_sensor_id {
 
 void temp_sensor_init(void);
 void temp_sensor_main(void);
-bool get_temperature(temp_sensor_id_t id, struct sensor_value *temperature);
+bool temp_sensor_get_temperature(temp_sensor_id_t id, struct sensor_value *temperature);
 
 #endif /* __TEMP_SENSOR_H__ */

@@ -207,8 +207,8 @@ static void display_update_screen(){
             // set cursor
             result = auxdisplay_cursor_position_set(lcd_dev,
                         AUXDISPLAY_POSITION_ABSOLUTE,
-                        i % _LCD_COLUMNS,
-                        i / _LCD_COLUMNS
+                        i % LCD_COLUMNS,
+                        i / LCD_COLUMNS
                     );
             if (0 > result){
                 continue;

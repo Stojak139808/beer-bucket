@@ -116,7 +116,7 @@ void temp_sensor_main(){
     }
 }
 
-bool get_temperature(temp_sensor_id_t id, struct sensor_value *temperature){
+bool temp_sensor_get_temperature(temp_sensor_id_t id, struct sensor_value *temperature){
 
     sensor_context_t *context = NULL;
     int buff_id = 0;
