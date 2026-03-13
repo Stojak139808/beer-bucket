@@ -8,4 +8,5 @@ target_sources(app PRIVATE
     src/temp_sensor.c
     src/display.c
     src/relay.c
+    src/ds18b20.c
 )
