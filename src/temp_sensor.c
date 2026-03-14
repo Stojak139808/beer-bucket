@@ -1,11 +1,16 @@
 #include <zephyr/drivers/w1.h>
+#include <zephyr/drivers/sensor.h>
 #include <zephyr/device.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/sys/atomic.h>
 #include "temp_sensor.h"
+#include "ds18b20.h"
 
 /* Number of maximum consecutive read errors for auxilary temperature sensor */
 #define AUX_SENSOR_ERR_MAX 5
+
+/* main sensor configuration */
+#define MAIN_SENSOR_ERR_MAX 5
 
 typedef struct temp_sensor_attr {
     enum sensor_channel channel;
@@ -50,15 +55,26 @@ static bool sensor_init_attributes(const struct device *dev, temp_sensor_attr_t 
 static void temp_sensor_set_state(sensor_context_t *context, sensor_state_t new_state);
 static void execute_sensor_state(const sensor_t *sensor);
 
-/* auxilary sensor configuration */
+/* auxilary sensor states */
 static void aux_temp_sensor_init(void);
 static void aux_temp_sensor_running(void);
 static void aux_temp_sensor_error(void);
+
+/* main sensor states */
+static void main_temp_sensor_init(void);
+static void main_temp_sensor_running(void);
+static void main_temp_sensor_error(void);
 
 const sensor_state_table_t aux_sensor_states[] = {
     {STATE_INITIALIZING,    aux_temp_sensor_init    },
     {STATE_RUNNING,         aux_temp_sensor_running },
     {STATE_ERROR,           aux_temp_sensor_error   }
+};
+
+const sensor_state_table_t main_sensor_states[] = {
+    {STATE_INITIALIZING,    main_temp_sensor_init    },
+    {STATE_RUNNING,         main_temp_sensor_running },
+    {STATE_ERROR,           main_temp_sensor_error   }
 };
 
 static temp_sensor_attr_t aux_temp_sensor_attr[] = {
@@ -70,7 +86,7 @@ const struct device *const aux_temp_dev = DEVICE_DT_GET_ANY(ti_tmp112);
 static sensor_context_t aux_temp_sensor_context;
 
 /* main sensor configuration */
-const struct device *const main_temp_dev = DEVICE_DT_GET(DT_NODELABEL(w1));
+const struct device *const main_temp_bus = DEVICE_DT_GET(DT_NODELABEL(w1));
 static sensor_context_t main_temp_sensor_context;
 
 
@@ -84,13 +100,12 @@ static sensor_t sensors[] = {
         .state_table = aux_sensor_states
     },
     {
-        .id = 0xff,
-        .dev = main_temp_dev,
-        .context = NULL,
-        .state_table = NULL
+        .id = MAIN_TEMPERATURE_SENSOR,
+        .dev = main_temp_bus,
+        .context = &main_temp_sensor_context,
+        .state_table = main_sensor_states
     }
 };
-
 
 void temp_sensor_init(){
 
@@ -211,6 +226,79 @@ err:
 }
 
 void aux_temp_sensor_error(){
+
+}
+
+static void main_temp_sensor_init(void){
+
+    int result = 0;
+
+    result = ds18b20_init(main_temp_bus);
+    if (0 > result) {
+        goto error;
+    }
+
+    result = ds18b20_set_config(main_temp_bus, 0x00, 0x00, DS18B20_RESOLUTION_12_BITS);
+    if (0 > result) {
+        goto error;
+    }
+
+    result = ds18b20_trigger_conversion(main_temp_bus);
+    if (0 > result) {
+        goto error;
+    }
+
+    temp_sensor_set_state(&main_temp_sensor_context, STATE_RUNNING);
+
+error:
+    return;
+}
+
+static void main_temp_sensor_running(void){
+
+    int result = 0;
+    int current_buf_id = atomic_get(&aux_temp_sensor_context.current_temperature_id);
+    int next_buf_id = (current_buf_id & 0x01) ^ 0x01; // toggle ID
+
+    struct sensor_value new_value = {0U, 0U};
+
+    result = ds18b20_get_temperature(main_temp_bus, &new_value);
+    if (-ENOEXEC == result) {
+        /* there was not conversion trigger */
+        ds18b20_trigger_conversion(main_temp_bus);
+    }
+    else if (-EBUSY == result) {
+        /* conversion still in progress */
+        return;
+    }
+    else if (0U > result) {
+        /* other error */
+        goto error;
+    }
+
+    main_temp_sensor_context.current_temperature_buf[next_buf_id] = new_value;
+    main_temp_sensor_context.is_reading_valid = true;
+    main_temp_sensor_context.err_read_cnt = 0;
+
+    /* publish the new value */
+    atomic_set(&main_temp_sensor_context.current_temperature_id, next_buf_id);
+
+    /* trigger next conversion */
+    result = ds18b20_trigger_conversion(main_temp_bus);
+    if (0U > result) {
+        goto error;
+    }
+
+    printk("temp is %d (%d micro)\n", new_value.val1,
+        new_value.val2);
+    return;
+
+error:
+    /* placeholder */
+    return;
+}
+
+static void main_temp_sensor_error(void){
 
 }
 

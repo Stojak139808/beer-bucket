@@ -4,7 +4,7 @@
 #include <zephyr/drivers/sensor.h>
 
 typedef enum temp_sensor_id {
-    //MAIN_TEMPERATURE_SENSOR,
+    MAIN_TEMPERATURE_SENSOR,
     AUX_TEMPERATURE_SENSOR,
     TEMP_SENSOR_COUNT
 }temp_sensor_id_t;
