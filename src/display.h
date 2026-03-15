@@ -24,4 +24,6 @@ void display_control(display_control_t onoff);
 void display_set_text(const display_buffer_t *text);
 void display_set_brightness(uint8_t brightness);
 
+bool display_is_ready(void);
+
 #endif /* __DISPLAY_H__ */

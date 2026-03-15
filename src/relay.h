@@ -11,4 +11,6 @@ int relay_init(void);
 void relay_set(relay_state_t state);
 relay_state_t relay_get(void);
 
+bool relay_is_ready(void);
+
 #endif /* __RELAY_H__ */

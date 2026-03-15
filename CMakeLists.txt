@@ -9,4 +9,5 @@ target_sources(app PRIVATE
     src/display.c
     src/relay.c
     src/ds18b20.c
+    src/sys.c
 )

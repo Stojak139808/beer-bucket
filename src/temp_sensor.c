@@ -151,6 +151,22 @@ bool temp_sensor_get_temperature(temp_sensor_id_t id, struct sensor_value *tempe
     return reading_validity;
 }
 
+bool temp_sensor_main_is_ready(void){
+    bool is_ready = false;
+    if (STATE_RUNNING == main_temp_sensor_context.current_state) {
+        is_ready = true;
+    }
+    return is_ready;
+}
+
+bool temp_sensor_aux_is_ready(void){
+    bool is_ready = false;
+    if (STATE_RUNNING == aux_temp_sensor_context.current_state) {
+        is_ready = true;
+    }
+    return is_ready;
+}
+
 static void execute_sensor_state(const sensor_t *sensor){
 
     const sensor_state_table_t *states = sensor->state_table;

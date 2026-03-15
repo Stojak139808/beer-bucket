@@ -32,12 +32,13 @@ typedef struct display_context {
     display_buffer_t screen_data_shadow; /* whats on the display */
     uint8_t display_brightness;
     display_control_t requested_status;
+    bool is_ready;
 }display_context_t;
 
-typedef struct sensor_state_table {
+typedef struct display_state_table {
     display_state_t name;
     display_state_handle_t handle;
-}sensor_state_table_t;
+}display_state_table_t;
 
 /* declaration of a handle for each state */
 static void display_state_init(void);
@@ -46,14 +47,13 @@ static void display_state_off(void);
 static void display_state_error(void);
 
 static void display_set_state(display_state_t new_state);
-static display_state_t display_get_state(void);
 
 static void display_update_screen(void);
 
 static const struct device *lcd_dev = DEVICE_DT_GET(_LCD_NODE);
 static display_context_t display_context;
 
-static sensor_state_table_t display_state_handles[] = {
+static display_state_table_t display_state_handles[] = {
     {DISP_STATE_INIT,         display_state_init          },
     {DISP_STATE_ON,           display_state_on            },
     {DISP_STATE_OFF,          display_state_off           },
@@ -63,7 +63,8 @@ static sensor_state_table_t display_state_handles[] = {
 void display_init(){
     display_context = (display_context_t){
         .current_state = DISP_STATE_INIT,
-        .display_brightness = 0x00U
+        .display_brightness = 0x00U,
+        .is_ready = false
     };
 
     // clear buffers
@@ -103,6 +104,10 @@ void display_set_brightness(uint8_t brightness){
     display_context.display_brightness = brightness;
 }
 
+bool display_is_ready(void){
+    return display_context.is_ready;
+}
+
 static void display_state_init(void){
 
     int result = 0;
@@ -119,6 +124,7 @@ static void display_state_init(void){
         return;
     }
 
+    display_context.is_ready = true;
     display_set_state(DISP_STATE_OFF);
 }
 
@@ -187,10 +193,6 @@ static void display_set_state(display_state_t new_state){
     if (DISP_STATE_COUNT > new_state){
         display_context.current_state = new_state;
     }
-}
-
-static display_state_t display_get_state(){
-    return display_context.current_state;
 }
 
 static void display_update_screen(){

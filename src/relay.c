@@ -65,3 +65,7 @@ relay_state_t relay_get(){
     };
     return ret;
 }
+
+bool relay_is_ready(void){
+    return relay_context.is_ready;
+}
