@@ -338,4 +338,3 @@ static bool sensor_init_attributes(const struct device *dev, temp_sensor_attr_t 
 
     return true;
 }
-

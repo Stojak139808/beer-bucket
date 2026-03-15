@@ -1,7 +1,7 @@
 /*
             xiao_ble
          +-----------+
-        -|0        5V|- N/C
+    W1  -|0        5V|- N/C
         -|1       GND|- GND
         -|2      3.3V|- 3.3V
         -|3        10|-
@@ -19,7 +19,6 @@
         status = "okay";
 
         mode = <4>;
-        
         columns = <16>;
         rows = <2>;
 
@@ -40,7 +39,7 @@
         compatible = "zephyr,w1-gpio";
         status = "okay";
 
-        // external pull-up resistor
+        // use external pull-up resistor
         gpios = <&gpio0 2 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
     };
     
