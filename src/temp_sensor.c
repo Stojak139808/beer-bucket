@@ -153,7 +153,9 @@ bool temp_sensor_get_temperature(temp_sensor_id_t id, struct sensor_value *tempe
 
 bool temp_sensor_main_is_ready(void){
     bool is_ready = false;
-    if (STATE_RUNNING == main_temp_sensor_context.current_state) {
+    /* wait for running state and first temperature sample */
+    if ((STATE_RUNNING == main_temp_sensor_context.current_state) &&
+        (true == main_temp_sensor_context.is_reading_valid)) {
         is_ready = true;
     }
     return is_ready;
@@ -161,7 +163,10 @@ bool temp_sensor_main_is_ready(void){
 
 bool temp_sensor_aux_is_ready(void){
     bool is_ready = false;
-    if (STATE_RUNNING == aux_temp_sensor_context.current_state) {
+
+    /* wait for running state and first temperature sample */
+    if ((STATE_RUNNING == aux_temp_sensor_context.current_state) &&
+        (true == aux_temp_sensor_context.is_reading_valid)) {
         is_ready = true;
     }
     return is_ready;
