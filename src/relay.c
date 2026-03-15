@@ -69,3 +69,35 @@ relay_state_t relay_get(){
 bool relay_is_ready(void){
     return relay_context.is_ready;
 }
+
+relay_hysteresis_t relay_define_hysteresis(struct sensor_value A, struct sensor_value B){
+    return (relay_hysteresis_t) {
+        .A = A,
+        .B = B
+    };
+}
+
+relay_state_t relay_get_hysteresis_output(relay_hysteresis_t *hysteresis, struct sensor_value *input,
+    relay_state_t curr_state){
+
+    relay_state_t output = RELAY_OFF;
+
+    if (RELAY_ON == curr_state) {
+        if (sensor_value_to_milli(input) <= sensor_value_to_milli(&hysteresis->A)){
+            output = RELAY_OFF;
+        }
+        else {
+            output = RELAY_ON;
+        }
+    }
+    else if (RELAY_OFF == curr_state) {
+        if (sensor_value_to_milli(input) >= sensor_value_to_milli(&hysteresis->B)){
+            output = RELAY_ON;
+        }
+        else {
+            output = RELAY_OFF;
+        }
+    }
+
+    return output;
+}
