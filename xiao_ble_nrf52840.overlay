@@ -1,13 +1,13 @@
 /*
             xiao_ble
          +-----------+
-    W1  -|0        5V|- N/C
-        -|1       GND|- GND
+     W1 -|0        5V|- N/C
+  RELAY -|1       GND|- GND
         -|2      3.3V|- 3.3V
         -|3        10|-
     SDA -|4         9|-
-    SCL -|5         8|- RELAY
-    TX  -|6         7|- RX
+    SCL -|5         8|- 
+     TX -|6         7|- RX
          +-----------+
 */
 
@@ -46,7 +46,7 @@
     outputs {
         compatible = "gpio-leds"; // this is not an LED, needs to be fixed
         relay_main: relay_main {
-            gpios = <&gpio1 13 GPIO_ACTIVE_HIGH>;
+            gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
             status = "okay";
 
         };
