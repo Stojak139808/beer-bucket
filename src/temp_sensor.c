@@ -233,9 +233,7 @@ static void aux_temp_sensor_running(){
         printk("sensor_channel_get failed ret %d\n", ret);
         goto err;
     }
-    
-    printk("temp is %d (%d micro)\n", new_value.val1,
-        new_value.val2);
+
     return;
 
 err:
@@ -310,8 +308,6 @@ static void main_temp_sensor_running(void){
         goto error;
     }
 
-    printk("temp is %d (%d micro)\n", new_value.val1,
-        new_value.val2);
     return;
 
 error:

@@ -7,6 +7,8 @@
 #define LCD_COLUMNS     DT_PROP(_LCD_NODE, columns)
 #define LCD_ROWS        DT_PROP(_LCD_NODE, rows)
 
+#define DISPLAY_DEGREES_S "\xDF"
+
 typedef enum display_control{
     DISP_ON,
     DISP_OFF
