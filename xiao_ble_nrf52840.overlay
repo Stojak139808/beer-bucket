@@ -74,6 +74,13 @@
         reg = <0x48>;
         conversion-rate = <250>; // 250mHz conversion rate
     };
+
+    rtc_ext: ds1307@68 {
+        compatible = "maxim,ds1307";
+        status = "okay";
+        reg = <0x68>;
+    };
+
 };
 
 &spi2 {

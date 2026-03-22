@@ -10,4 +10,5 @@ target_sources(app PRIVATE
     src/relay.c
     src/ds18b20.c
     src/sys.c
+    src/clock.c
 )

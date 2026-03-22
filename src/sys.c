@@ -3,6 +3,7 @@
 #include "display.h"
 #include "relay.h"
 #include "temp_sensor.h"
+#include "clock.h"
 
 #define SYS_RELAY_HYSTERESIS_A (struct sensor_value){-1, 0}
 #define SYS_RELAY_HYSTERESIS_B (struct sensor_value){1, 0}
@@ -148,6 +149,7 @@ static void sys_state_init(void){
     bool is_module_ready = false;
 
     (void)relay_init();
+    clock_init();
 
     /* check if all required modules are ready */
     for (i = 0; i < sizeof(sys_init_checklist)/sizeof(sys_init_entry_t); i++) {
